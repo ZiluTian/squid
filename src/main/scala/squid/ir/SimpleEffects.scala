@@ -184,7 +184,7 @@ trait StandardEffects extends SimpleEffects {
     }
   }
   
-  transparentTyps += typeSymbol[scala.collection.immutable.Traversable[Any]]
+  transparentTyps += typeSymbol[scala.collection.immutable.Iterable[Any]]
   transparentTyps += typeSymbol[scala.collection.immutable.Seq[Any]]
   transparentTyps += typeSymbol[scala.collection.immutable.Seq.type]
   transparentTyps += typeSymbol[scala.collection.immutable.List[Any]] // Useful to make things like List.map 

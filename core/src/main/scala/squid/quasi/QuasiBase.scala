@@ -227,7 +227,7 @@ self: Base =>
     def apply[T:CodeType](): Variable[T] = apply("x")
     def fromBound[T](bound: BoundVal)(implicit ev: self.type <:< self.type with IntermediateBase): Variable[T] = {
       val s: self.type with IntermediateBase = self
-      val b: s.BoundVal = substBounded[Base,self.type,s.type,({type λ[X<:Base] = X#BoundVal})#λ](bound)
+      val b: s.BoundVal = substBounded[Base,self.type,s.type,({type λ[X<:Base] = X#BoundVal})#λ](bound)(singletonIsSingleton(ev))
       s.mkVariable(b)
     }
     def mk[T](bound: BoundVal, typ: TypeRep): Variable[T] = new Variable[T](bound)(CodeType(typ))
@@ -437,13 +437,13 @@ self: Base =>
     val vals = a._1 ++ b._1
     Some(vals, typs, splicedVals)
   }
-  protected def mergeAll(as: TraversableOnce[Option[Extract]]): Option[Extract] = {
-    if (as isEmpty) return Some(EmptyExtract)
+  protected def mergeAll(as: IterableOnce[Option[Extract]]): Option[Extract] = {
+    if (as.iterator.isEmpty) return Some(EmptyExtract)
     
     //as.reduce[Option[Extract]] { case (acc, a) => for (acc <- acc; a <- a; m <- merge(acc, a)) yield m }
     /* ^ not good as it evaluates all elements of `as` (even if it's an Iterator or Stream) */
     
-    val ite = as.toIterator
+    val ite = as.iterator
     var res = ite.next()
     while(ite.hasNext && res.isDefined) res = mergeOpt(res, ite.next())
     res

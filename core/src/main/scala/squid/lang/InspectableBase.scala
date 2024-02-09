@@ -87,7 +87,7 @@ trait InspectableBase extends IntermediateBase with quasi.QuasiBase with TraceDe
   }
   
   def `internal checkExtract`(position: String, maps: Extract)(valKeys: String*)(typKeys: String*)(splicedValKeys: String*): Extract = {
-    val prnt = (s: Traversable[_]) => s mkString ("{", ",", "}")
+    val prnt = (s: Iterable[_]) => s mkString ("{", ",", "}")
     //def keySets = s"{ ${valKeys.toSet}; ${typKeys.toSet}; ${flatValKeys.toSet} }" // Scala bug java.lang.VerifyError: Bad type on operand stack
     val keySets = () => s"( ${prnt(valKeys)}; ${prnt(typKeys)}; ${prnt(splicedValKeys)} )"
     
@@ -133,9 +133,9 @@ trait InspectableBase extends IntermediateBase with quasi.QuasiBase with TraceDe
     
     @inline final def analyse(pf: PartialFunction[Code[T,_ <: C],Unit]): Unit = analyseTopDown(pf)
     def analyseTopDown(pf: PartialFunction[Code[T,_ <: C],Unit]): Unit = 
-      traverseTopDown(r => pf.runWith(identity)(Code(r)) thenReturn Unit)(self.rep)
+      traverseTopDown(r => pf.runWith(identity)(Code(r)) thenReturn ())(self.rep)
     def analyseBottomUp(pf: PartialFunction[Code[T,_ <: C],Unit]): Unit = 
-      traverseBottomUp(r => pf.runWith(identity)(Code(r)) thenReturn Unit)(self.rep)
+      traverseBottomUp(r => pf.runWith(identity)(Code(r)) thenReturn ())(self.rep)
     
     def close: Option[ClosedCode[T]] = self.asInstanceOf[ClosedCode[T]] optionIf freeVariables(self.rep).isEmpty
     

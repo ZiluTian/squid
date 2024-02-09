@@ -78,11 +78,11 @@ object MacroUtils {
        * debugging. This prints a unique integer in front of the message to always print it.
        */
       def apply(x: => Any, xs: Any*): Unit = if (enabled) {
-        println(debugNum + "> " + ((x +: xs) mkString "  "))
+        println(s"$debugNum> ${(x +: xs) mkString " "}")
         debugNum += 1
       }
       def pos(x: => Any, xs: Any*): Unit = if (enabled) {
-        c.warning(c.enclosingPosition, debugNum + "> " + ((x +: xs) mkString "  "))
+        c.warning(c.enclosingPosition, s"${debugNum} > ${((x +: xs) mkString "  ")}")
         debugNum += 1
       }
       def debugOptionEnabled = debugOption

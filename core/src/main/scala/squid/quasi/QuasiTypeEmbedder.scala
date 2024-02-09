@@ -29,12 +29,12 @@ abstract class QuasiTypeEmbedder[C <: scala.reflect.macros.blackbox.Context, B <
   
   class Impl extends ModularEmbedding[c.universe.type, B](c.universe, base, debug) {
     
-    def insertTypeEvidence(ev: base.TypeRep): base.TypeRep = ev
+    def insertTypeEvidence(ev: this.base.TypeRep): this.base.TypeRep = ev
     
     /* We override this method to make sure to try and find an implicit for a given abstract type, before decomposing it;
      * this is to allow the common metpaprogramming pattern where one carries bundles of abstract types and their
      * implicit representations with one's code values. */
-    override def liftTypeUncached(tp: Type, wide: Boolean): base.TypeRep = tp match {
+    override def liftTypeUncached(tp: Type, wide: Boolean): this.base.TypeRep = tp match {
       case TypeRef(prefix, sym, targs)
         if prefix != NoPrefix
         && !sym.isClass
@@ -47,7 +47,7 @@ abstract class QuasiTypeEmbedder[C <: scala.reflect.macros.blackbox.Context, B <
     
     val QTSym = symbolOf[QuasiBase#CodeType[_]]
     
-    def lookForTypeImplicit(tp: Type): Option[base.TypeRep] = {
+    def lookForTypeImplicit(tp: Type): Option[this.base.TypeRep] = {
       
       val irType = c.typecheck(tq"$baseTree.CodeType[$tp]", c.TYPEmode) // TODO use internal.typeRef
       debug(s"Searching for implicit of type: $irType")
@@ -55,7 +55,7 @@ abstract class QuasiTypeEmbedder[C <: scala.reflect.macros.blackbox.Context, B <
         case EmptyTree =>
         case impt =>
           debug(s"Found: "+showCode(impt))
-          return Some(q"$impt.rep".asInstanceOf[base.TypeRep] // FIXME
+          return Some(q"$impt.rep".asInstanceOf[this.base.TypeRep] // FIXME
             |> insertTypeEvidence)
       }
       
@@ -81,7 +81,7 @@ abstract class QuasiTypeEmbedder[C <: scala.reflect.macros.blackbox.Context, B <
           // For example in  {{{ (typs:List[CodeType[_]]) map { case typ: CodeType[t] => dbg.implicitType[t] } }}}
         =>
           debug("FOUND QUOTED TYPE "+sym)
-          return Some(q"$sym.rep".asInstanceOf[base.TypeRep] // FIXME
+          return Some(q"$sym.rep".asInstanceOf[this.base.TypeRep] // FIXME
             |> insertTypeEvidence)
         //case (sym, TypeRef(tpbase, QTSym, tp::Nil)) =>
         //  debug(s"Note: $tpbase =/= ${baseTree.tpe}")
@@ -110,7 +110,7 @@ abstract class QuasiTypeEmbedder[C <: scala.reflect.macros.blackbox.Context, B <
         > Searching for an `FoldTupleVarOptim.this.base.CodeType[squid.FoldTupleVarOptim.ta.Typ]` implicit
         > FOUND QUOTED TYPE value ta
     */
-    override def unknownTypefallBack(tp: Type): base.TypeRep = {
+    override def unknownTypefallBack(tp: Type): this.base.TypeRep = {
       
       debug(s"Lifting unknown type $tp (${tp.widen.dealias})")
       
@@ -155,7 +155,7 @@ abstract class QuasiTypeEmbedder[C <: scala.reflect.macros.blackbox.Context, B <
             // ^ actually useful to cache the tag!
             */
             
-            q"$baseTree.uninterpretedType($impt)".asInstanceOf[base.TypeRep] |> insertTypeEvidence
+            q"$baseTree.uninterpretedType($impt)".asInstanceOf[this.base.TypeRep] |> insertTypeEvidence
             
             // Older:
             /* Does not help, as it bypasses the underlying base:

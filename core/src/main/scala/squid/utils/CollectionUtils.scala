@@ -14,63 +14,71 @@
 
 package squid.utils
 
-import scala.collection.generic.CanBuildFrom
+import scala.collection.BuildFrom
 import scala.collection.mutable
+import scala.collection.IterableOnce
+import scala.collection.IterableOps
 
 object CollectionUtils {
-  
+// Cannot construct a collection of type Right with elements of type QuasiEmbedder.this.c.universe.SelectFromTypeTree based on a collection of type scala.collection.immutable.Map[QuasiEmbedder.this.c.universe.TermName,QuasiEmbedder.this.c.universe.Type]
+// scp: Iterable[(TermName,Type)]
+// val f: ((TermName, Type)) => Either[(TermName, Type), Tree] = (x: (TermName, Type))
+  // implicit def buildFromAny[Element, Collection[+Element] <: Iterable[Element] with IterableOps[Any, Collection, Any]]
+  //   : BuildFrom[Collection[Any], Element, Collection[Element]] =
+  //   scala.collection.BuildFrom.buildFromIterableOps[Collection, Any, Element]
+
   /** Works, but not AnyVal */
-  implicit class TraversableOnceHelper[A,Repr](private val repr: Repr)(implicit isTrav: Repr => TraversableOnce[A]) {
+  implicit class TraversableOnceHelper[A,Repr](private val repr: Repr)(implicit isTrav: Repr => IterableOnce[A]) {
     def collectPartition[B,Left](pf: PartialFunction[A, B])
-    (implicit bfLeft: CanBuildFrom[Repr, B, Left], bfRight: CanBuildFrom[Repr, A, Repr]): (Left, Repr) = {
-      val left = bfLeft(repr)
-      val right = bfRight(repr)
-      val it = repr.toIterator
+    (implicit bfLeft: BuildFrom[Repr, B, Left], bfRight: BuildFrom[Repr, A, Repr]): (Left, Repr) = {
+      val left = bfLeft.newBuilder(repr)
+      val right = bfRight.newBuilder(repr)
+      val it = repr.iterator
       while (it.hasNext) {
-        val next = it.next
+        val next = it.next()
         if (!pf.runWith(left += _)(next)) right += next
       }
-      left.result -> right.result
+      left.result() -> right.result()
     }
     
     // This is probably the most useful version:
     def collectOr[B,C,Left,Right](pf: PartialFunction[A, B], f: A => C)
-    (implicit bfLeft: CanBuildFrom[Repr, B, Left], bfRight: CanBuildFrom[Repr, C, Right]): (Left, Right) = {
-      val left = bfLeft(repr)
-      val right = bfRight(repr)
-      val it = repr.toIterator
+    (implicit bfLeft: BuildFrom[Repr, B, Left], bfRight: BuildFrom[Repr, C, Right]): (Left, Right) = {
+      val left = bfLeft.newBuilder(repr)
+      val right = bfRight.newBuilder(repr)
+      val it = repr.iterator
       while (it.hasNext) {
-        val next = it.next
+        val next = it.next()
         if (!pf.runWith(left += _)(next)) right += f(next)
       }
-      left.result -> right.result
+      left.result() -> right.result()
     }
     
     def mapSplit[B,C,Left,Right](f: A => Either[B,C])
-    (implicit bfLeft: CanBuildFrom[Repr, B, Left], bfRight: CanBuildFrom[Repr, C, Right]): (Left, Right) = {
-      val left = bfLeft(repr)
-      val right = bfRight(repr)
-      val it = repr.toIterator
+    (implicit bfLeft: BuildFrom[Repr, B, Left], bfRight: BuildFrom[Repr, C, Right]): (Left, Right) = {
+      val left = bfLeft.newBuilder(repr)
+      val right = bfRight.newBuilder(repr)
+      val it = repr.iterator
       while (it.hasNext) {
-        f(it.next) match {
+        f(it.next()) match {
           case Left(next) => left += next
           case Right(next) => right += next
         }
       }
-      left.result -> right.result
+      left.result() -> right.result()
     }
     
     
-    def zipAnd[B,C,NewRepr](other: TraversableOnce[B])(f: (A,B) => C)
-    (implicit bf: CanBuildFrom[Repr, C, NewRepr]): NewRepr = {
-      val res = bf(repr)
-      val it0 = repr.toIterator
-      val it1 = other.toIterator
+    def zipAnd[B,C,NewRepr](other: IterableOnce[B])(f: (A,B) => C)
+    (implicit bf: BuildFrom[Repr, C, NewRepr]): NewRepr = {
+      val res = bf.newBuilder(repr)
+      val it0 = repr.iterator
+      val it1 = other.iterator
       while (it0.hasNext && it1.hasNext) {
-        val next = f(it0.next, it1.next)
+        val next = f(it0.next(), it1.next())
         res += next
       }
-      res.result
+      res.result()
     }
     
   }
@@ -89,7 +97,7 @@ object CollectionUtils {
         }
         i += 1
       }
-      repr.trimEnd(removed)
+      repr.dropRightInPlace(removed)
     }
   }
   

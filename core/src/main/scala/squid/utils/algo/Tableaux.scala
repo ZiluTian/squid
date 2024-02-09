@@ -59,7 +59,7 @@ class Tableaux {
   case object Trivial extends Formula
   
   object Formulas {
-    implicit def symbolToAtom(sym: Symbol) = Atom(sym)
+    implicit def symbolToAtom(sym: Symbol): Atom = Atom(sym)
     
     type Leaf = Set[Formula]
     

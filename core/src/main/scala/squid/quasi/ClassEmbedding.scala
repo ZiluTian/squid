@@ -274,7 +274,7 @@ class ClassEmbedding(override val c: whitebox.Context) extends QuasiMacros(c) { 
     val List(clsObjTree, modObjTree) = List(true -> encodedName, false -> (encodedName+"$")) map { case isClass -> encName =>
       
       // All class member name counts; will be used to generate the right overloading index
-      var counts = allDefs.collect { case (`isClass`, d:NameTree) => d.name }.groupBy(identity).mapValues(_.size).filter(_._2 > 1)
+      var counts = allDefs.collect { case (`isClass`, d:NameTree) => d.name }.groupBy(identity).mapValues(_.size).toMap.filter(_._2 > 1)
       
       reifyEmbeddedType(encName, allDefs.reverseIterator.collect {
         case (`isClass`, dd:DefDef) =>

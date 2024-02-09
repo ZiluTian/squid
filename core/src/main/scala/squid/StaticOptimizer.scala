@@ -203,7 +203,7 @@ class StaticOptimizerMacros(override val c: whitebox.Context) extends statics.Co
           case Ident(name) if thisNames(name) =>
             //val Seq(typ,ths,field) = name.toString.splitSane(':')
             val Seq(typ,ths,field) = name.toString.splitSane('.')
-            Select(This(TypeName(typ)),TermName(field))
+            Select(This(TypeName(typ.asInstanceOf[String])),TermName(field.asInstanceOf[String]))
           case _ => super.transform(x)
         }
       } transform r

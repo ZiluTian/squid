@@ -19,7 +19,7 @@ import scala.annotation.tailrec
 package object algo {
   
   /** From https://gist.github.com/ThiporKong/4399695 */
-  def topologicalSort[A](edges: Traversable[(A, A)]): Iterable[A] = {
+  def topologicalSort[A](edges: Iterable[(A, A)]): Iterable[A] = {
     @tailrec
     def tsort(toPreds: Map[A, Set[A]], done: Iterable[A]): Iterable[A] = {
         val (noPreds, hasPreds) = toPreds.partition { _._2.isEmpty }
@@ -27,7 +27,7 @@ package object algo {
             if (hasPreds.isEmpty) done else sys.error(hasPreds.toString)
         } else {
             val found = noPreds.map { _._1 }
-            tsort(hasPreds.mapValues { _ -- found }, done ++ found)    
+            tsort(hasPreds.view.mapValues({ _ -- found }).toMap, done ++ found)    
         }
     }
 

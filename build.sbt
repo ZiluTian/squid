@@ -12,10 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-val scala211Version = "2.11.12"
-val scala212Version = "2.12.11"
+// val scala211Version = "2.11.12"
+// val scala212Version = "2.12.18"
+val scala213Version = "2.13.12"
+val scalatestVersion = "3.2.17"
+val sourceCodeVersion = "0.3.1"
+val singletonOpsVersion = "0.5.0"
+val shapelessVersion = "2.3.10"
 
-val paradiseVersion = "2.1.1"
 val squidVersion = "0.4.1-SNAPSHOT"
 val squidIsSnapshot: Boolean = squidVersion endsWith "-SNAPSHOT"
 
@@ -23,12 +27,11 @@ val initialConsoleCommands = "import squid.IR, IR.Predef._, IR.Quasicodes._"
 
 lazy val commonSettings = Seq(
   version := squidVersion,
-  scalaVersion := scala212Version, // default Scala version
-  crossScalaVersions := Seq(scala211Version, scala212Version),
+  scalaVersion := scala213Version, // default Scala version
   organization := "ch.epfl.data",
   autoCompilerPlugins := true,
   scalacOptions ++= Seq("-feature", "-language:implicitConversions", "-language:higherKinds", "-language:postfixOps"
-    , "-deprecation", "-unchecked"
+    , "-deprecation", "-unchecked", "-Ymacro-annotations"
     //, "-Ybackend-parallelism", "4" // does not seem to result in noticeable improvements of compile time,
                                      // as measured by repeatedly doing ";reload ;clean ;test:clean ;test:compile" in
                                      // sbt, which is reported to take around "Total time: 48 s"
@@ -37,13 +40,12 @@ lazy val commonSettings = Seq(
   parallelExecution in Test := false,
   resolvers += Resolver.sonatypeRepo("snapshots"),
   resolvers += Resolver.sonatypeRepo("releases"),
-  addCompilerPlugin("org.scalamacros" % "paradise" % paradiseVersion cross CrossVersion.full),
   unmanagedSources in Compile := (unmanagedSources in Compile).value.filterNot(_.getPath.contains("_perso")),
-  libraryDependencies += "org.scalactic" %% "scalactic" % "3.0.5",
-  libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.5" % "test",
-  libraryDependencies += "com.lihaoyi" %% "sourcecode" % "0.1.4",
-  libraryDependencies += "eu.timepit" %% "singleton-ops" % "0.3.1",
-  libraryDependencies += "com.chuusai" %% "shapeless" % "2.3.3",
+  libraryDependencies += "org.scalactic" %% "scalactic" % scalatestVersion,
+  libraryDependencies += "org.scalatest" %% "scalatest" % scalatestVersion % "test",
+  libraryDependencies += "com.lihaoyi" %% "sourcecode" % sourceCodeVersion,
+  libraryDependencies += "eu.timepit" %% "singleton-ops" % singletonOpsVersion,
+  libraryDependencies += "com.chuusai" %% "shapeless" % shapelessVersion,
   
   //libraryDependencies += "com.lihaoyi" % "ammonite" % "1.1.2" % "test" cross CrossVersion.full,
   //// For the ammonite REPL:

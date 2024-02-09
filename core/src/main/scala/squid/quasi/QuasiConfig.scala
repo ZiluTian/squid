@@ -60,8 +60,8 @@ class DefaultQuasiConfig extends QuasiConfig {
     object base extends Meta.MirrorBase(baseTree, baseType |> some)
     
     val code = user(base) {
-      case (q"$tr: _*", bind) => q"$tr map (__$$ir => ${base.substitute(q"__$$ir.rep", bind mapValues base.readVal)}): _*"
-      case (tr, bind) => base.substitute(q"$tr.rep", bind mapValues base.readVal)
+      case (q"$tr: _*", bind) => q"$tr map (__$$ir => ${base.substitute(q"__$$ir.rep", bind mapValues base.readVal toMap)}): _*"
+      case (tr, bind) => base.substitute(q"$tr.rep", bind mapValues base.readVal toMap)
     }
     
     q"..${base.mkSymbolDefs}; $code"

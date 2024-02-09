@@ -29,7 +29,7 @@ package object utils {
   type & [+A,+B] = A with B
   
   import scala.language.existentials
-  type ? = t forSome{type t}
+  type `?` = t forSome{type t}
   type ! = Nothing
   
   /** For preventing widening of singleton types.
@@ -69,7 +69,7 @@ package object utils {
     @inline def into [B] (rhs: A => B): B = rhs(__self)
     
     @inline def |> [B] (rhs: A => B): B = rhs(__self)
-    @inline def |>? [B] (rhs: PartialFunction[A, B]): Option[B] = rhs andThen Some.apply applyOrElse (__self, Function const None)
+    @inline def |>? [B] (rhs: PartialFunction[A, B]): Option[B] = rhs andThen Some.apply _ applyOrElse (__self, Function const None)
     @inline def |>?? [B] (rhs: PartialFunction[A, Option[B]]): Option[B] = rhs applyOrElse (__self, Function const None)
     @inline def |>! [B] (rhs: PartialFunction[A, B]): B = rhs(__self)
     
@@ -143,7 +143,7 @@ package object utils {
   
   implicit class StringOps(private val self: String) extends AnyVal {
     import collection.mutable
-    def splitSane(Sep: Char) = {
+    def splitSane(Sep: Char): mutable.ArrayBuffer[String] = {
       val buf = mutable.ArrayBuffer(new StringBuilder)
       for (c <- self) if (c == Sep) buf += new StringBuilder else buf.last append c
       buf.map(_.toString)
@@ -158,9 +158,9 @@ package object utils {
     }
   }
   
-  implicit class BoolTraversableOps(private val self: TraversableOnce[Bool]) extends AnyVal {
-    def any = self.exists(identity)
-    def all = self.forall(identity)
+  implicit class BoolTraversableOps(private val self: IterableOnce[Bool]) extends AnyVal {
+    def any = self.iterator.exists(identity)
+    def all = self.iterator.forall(identity)
   }
   
   @showAsInfix

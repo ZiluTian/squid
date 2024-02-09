@@ -294,7 +294,7 @@ class QuasiEmbedder[C <: blackbox.Context](val c: C) {
     
     val retType = rawTree.tpe.widen // Widen to avoid too-specific types like Double(1.0), and be more in-line with Scala's normal behavior
     
-    var termScope = termScopeParam // will contain the scope bases of all unquoted stuff + in xtion, possibly the scrutinee's scope
+    var termScope: List[Type] = termScopeParam // will contain the scope bases of all unquoted stuff + in xtion, possibly the scrutinee's scope
     // Note: in 'unapply' mode, termScope's last element should be the scrutinee's context
     
     var importedFreeVars = mutable.Map[String, Type]() // will contain the free vars imported by inserted IR's
@@ -385,7 +385,7 @@ class QuasiEmbedder[C <: blackbox.Context](val c: C) {
         object QTE extends QuasiTypeEmbedder[macroContext.type, b.type](macroContext, b, str => debug(str)) {
           val helper = QuasiEmbedder.this.Helpers
           //val baseTree: c.Tree = Base  // throws: scala.reflect.macros.TypecheckException: not found: value __b__
-          val baseTree: c.Tree = myBaseTree
+          val baseTree: this.c.Tree = myBaseTree
         }
         
         /** Special-cases the default modular embedding with quasiquote-specific details */
@@ -722,7 +722,7 @@ class QuasiEmbedder[C <: blackbox.Context](val c: C) {
                   val identVals = idents map (_ map scp)
                   val yes = identVals map (_ map (_._2))
                   val keys = idents.flatten.toSet
-                  val no = scp.filterKeys(!keys(_)).values.map(_._2).toList  // Q: does `no` work correctly in the presence of extracted binders?
+                  val no = scp.view.filterKeys(!keys(_)).values.map(_._2).toList  // Q: does `no` work correctly in the presence of extracted binders?
                   debug(s"HOPV: yes=$yes; no=$no")
                   val List(identVals2) = identVals // FIXME generalize
                   val hopvType = FunctionType(identVals2 map (_._1.typeSignature) : _*)(holeType)
@@ -840,7 +840,7 @@ class QuasiEmbedder[C <: blackbox.Context](val c: C) {
     
     
     //debug("Free variables instances: "+freeVariableInstances)
-    val freeVariables = freeVariableInstances.groupBy(_._1).mapValues(_.unzip._2) map {
+    val freeVariables = freeVariableInstances.groupBy(_._1).view.mapValues(_.unzip._2).toMap map {
       case (name, typs) => name -> glb(typs)
     }
     if (freeVariables nonEmpty) debug("Free variables: "+freeVariables)
@@ -909,31 +909,34 @@ class QuasiEmbedder[C <: blackbox.Context](val c: C) {
         if (config.inferOpenCode) q"$tree:$baseTree.OpenCode[$retType]"
         else if (Any <:< cleanedUpGLB && fv.isEmpty) q"$tree:$baseTree.ClosedCode[$retType]"
         else tree
-        
-        
+
       case Some(selector) =>
-        
-        val termHoleInfoProcessed = termHoleInfo mapValues {
-          case (scp, tp) =>
-            val (nominalScp,symbolicScp) = scp.mapSplit {
-              case(n,t) if extractedBinders.contains(n) => Right(tq"${extractedBinders(n)}#Ctx")
-              case(n,t) => Left(n -> t)
+        // termHoleInfo: Map[TermName,(Map[TermName,Type], Type)]
+        val termHoleInfoProcessed: Map[TermName, (CompoundTypeTree, Type)] = termHoleInfo.view.mapValues({
+          case (scp: Iterable[(TermName,Type)], tp: Type) =>
+            //zt Cannot construct a collection of type Right with elements of type QuasiEmbedder.this.c.universe.SelectFromTypeTree based on a collection of type scala.collection.immutable.Map[QuasiEmbedder.this.c.universe.TermName,QuasiEmbedder.this.c.universe.Type]
+            val (nominalScp: Iterable[(TermName, Type)], symbolicScp: Iterable[Tree]) = scp.mapSplit {
+                case(n,t) if extractedBinders.contains(n) => Right(tq"${extractedBinders(n)}#Ctx")
+                case(n,t) => Left(n -> t)
             }
+
             val scpTyp = 
               CompoundTypeTree(Template(
                 (termScope filterNot (Any <:< _) map typeToTree) ++ symbolicScp 
                   |>=? { case Nil => tq"$Any"::Nil }, // Scala typer doesn't seem to accept this being empty
                 noSelfType, nominalScp map { case(n,t) => q"val $n: $t" } toList))
             (scpTyp, tp)
-        }
+        }).toMap
+
         val termTypesToExtract = termHoleInfoProcessed map {
           case (name, (scpTyp, tp)) => name -> (
             if (splicedHoles(name)) tq"$scal.collection.Seq[$baseTree.Code[$tp,$scpTyp]]"
             else if (extractedBinders.isDefinedAt(name)) tq"${extractedBinders(name)}"
             else tq"$baseTree.Code[$tp,$scpTyp]"
           )}
-        val typeTypesToExtract = typeSymbols mapValues { sym => tq"$baseTree.CodeType[$sym]" }
+        val typeTypesToExtract = typeSymbols.view.mapValues(sym => tq"$baseTree.CodeType[$sym]").toMap
         
+        // Seq[Either[TermName, TypeName]]
         val extrTyps = holes.map {
           case Left(vname)  => termTypesToExtract.getOrElse(vname, lastWords(s"cannot find type info for term hole $vname"))
           case Right(tname) => typeTypesToExtract.getOrElse(tname, lastWords(s"cannot find type info for type hole $tname"))
