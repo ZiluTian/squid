@@ -914,12 +914,16 @@ class QuasiEmbedder[C <: blackbox.Context](val c: C) {
         // termHoleInfo: Map[TermName,(Map[TermName,Type], Type)]
         val termHoleInfoProcessed: Map[TermName, (CompoundTypeTree, Type)] = termHoleInfo.view.mapValues({
           case (scp: Iterable[(TermName,Type)], tp: Type) =>
-            //zt Cannot construct a collection of type Right with elements of type QuasiEmbedder.this.c.universe.SelectFromTypeTree based on a collection of type scala.collection.immutable.Map[QuasiEmbedder.this.c.universe.TermName,QuasiEmbedder.this.c.universe.Type]
-            val (nominalScp: Iterable[(TermName, Type)], symbolicScp: Iterable[Tree]) = scp.mapSplit {
-                case(n,t) if extractedBinders.contains(n) => Right(tq"${extractedBinders(n)}#Ctx")
-                case(n,t) => Left(n -> t)
+            
+            val nominalScp = mutable.ArrayBuffer.empty[(TermName, Type)]
+            val symbolicScp = mutable.ArrayBuffer.empty[Tree]
+            scp.foreach {
+              case(n,t) if extractedBinders.contains(n) =>
+                symbolicScp += tq"${extractedBinders(n)}#Ctx"
+              case(n,t) =>
+                nominalScp += n -> t
             }
-
+            
             val scpTyp = 
               CompoundTypeTree(Template(
                 (termScope filterNot (Any <:< _) map typeToTree) ++ symbolicScp 
@@ -927,7 +931,7 @@ class QuasiEmbedder[C <: blackbox.Context](val c: C) {
                 noSelfType, nominalScp map { case(n,t) => q"val $n: $t" } toList))
             (scpTyp, tp)
         }).toMap
-
+        
         val termTypesToExtract = termHoleInfoProcessed map {
           case (name, (scpTyp, tp)) => name -> (
             if (splicedHoles(name)) tq"$scal.collection.Seq[$baseTree.Code[$tp,$scpTyp]]"

@@ -29,8 +29,8 @@ object CollectionUtils {
 
   /** Works, but not AnyVal */
   implicit class TraversableOnceHelper[A,Repr](private val repr: Repr)(implicit isTrav: Repr => IterableOnce[A]) {
-    def collectPartition[B,Left](pf: PartialFunction[A, B])
-    (implicit bfLeft: BuildFrom[Repr, B, Left], bfRight: BuildFrom[Repr, A, Repr]): (Left, Repr) = {
+    def collectPartition[B,Lft](pf: PartialFunction[A, B])
+    (implicit bfLeft: BuildFrom[Repr, B, Lft], bfRight: BuildFrom[Repr, A, Repr]): (Lft, Repr) = {
       val left = bfLeft.newBuilder(repr)
       val right = bfRight.newBuilder(repr)
       val it = repr.iterator
@@ -42,8 +42,8 @@ object CollectionUtils {
     }
     
     // This is probably the most useful version:
-    def collectOr[B,C,Left,Right](pf: PartialFunction[A, B], f: A => C)
-    (implicit bfLeft: BuildFrom[Repr, B, Left], bfRight: BuildFrom[Repr, C, Right]): (Left, Right) = {
+    def collectOr[B,C,Lft,Rgt](pf: PartialFunction[A, B], f: A => C)
+    (implicit bfLeft: BuildFrom[Repr, B, Lft], bfRight: BuildFrom[Repr, C, Rgt]): (Lft, Rgt) = {
       val left = bfLeft.newBuilder(repr)
       val right = bfRight.newBuilder(repr)
       val it = repr.iterator
@@ -54,8 +54,8 @@ object CollectionUtils {
       left.result() -> right.result()
     }
     
-    def mapSplit[B,C,Left,Right](f: A => Either[B,C])
-    (implicit bfLeft: BuildFrom[Repr, B, Left], bfRight: BuildFrom[Repr, C, Right]): (Left, Right) = {
+    def mapSplit[B,C,Lft,Rgt](f: A => Either[B,C])
+    (implicit bfLeft: BuildFrom[Repr, B, Lft], bfRight: BuildFrom[Repr, C, Rgt]): (Lft, Rgt) = {
       val left = bfLeft.newBuilder(repr)
       val right = bfRight.newBuilder(repr)
       val it = repr.iterator
