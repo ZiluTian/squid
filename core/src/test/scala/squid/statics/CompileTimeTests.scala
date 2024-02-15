@@ -35,9 +35,11 @@ class CompileTimeTests extends AnyFunSuite {
     assertDoesNotCompile("compileTimeExec{ scala.Predef.assert(u == 0) }")
     // ^ Error:(39, 24) exception during macro expansion: java.lang.AssertionError: assertion failed
     
-    compileTimeExec{ scala.Predef.assert(u == 2 + 3) }
+    //zt The default toString method in Symbol has changed from s"'$name" (2.12) to "Symbol($name)" (2.13)
+    // https://github.com/scala/scala/blob/232521f418c1e2c535d3630b0a5b3972a06bbd4e/src/library/scala/Symbol.scala#L21C1-L21C53
+    compileTimeExec{ scala.Predef.assert(u == 2 + 10) }
     
-    val local = 'oops
+    val local = Symbol("oops")
     assertDoesNotCompile("compileTime{ local.name }")
     // Error:(43, 26) Non-static identifier 'local' of type: Symbol
     
@@ -57,18 +59,18 @@ class CompileTimeTests extends AnyFunSuite {
       sym.get
     }
     
-    implicit val foo = CompileTime('foo)
+    implicit val foo = CompileTime(Symbol("foo"))
     
     val bar = compileTime{ foo.get.name }
     
-    assert(lostStaticValue == 'foo)
+    assert(lostStaticValue == Symbol("foo"))
     assert(`test withStaticSymbol`(3) == "foofoofoo")
-    assert(`test withStaticSymbol`(2)('bar) == "barbar") // implicit conersion/lifting to CompileTime
+    assert(`test withStaticSymbol`(2)(Symbol("bar")) == "barbar") // implicit conersion/lifting to CompileTime
     
     val res = compileTime{ `test withStaticSymbol`(3) }
-    assertDoesNotCompile("compileTimeExec{ scala.Predef.assert(res == 'foofoofoo0.name) }")
-                          compileTimeExec{ scala.Predef.assert(res == 'foofoofoo .name) }
-    
+    assertDoesNotCompile("""compileTimeExec{ scala.Predef.assert(res == Symbol("foofoofoo0").name) }""")
+    compileTimeExec{ scala.Predef.assert(res == Symbol("foofoofoo").name) }
+  
   }
   
   test("Lack of Separate Compilation") {
@@ -87,7 +89,7 @@ class CompileTimeTests extends AnyFunSuite {
   
   test("Static Eval to Serializable") {
     
-    assert(compileTimeEval{ List(s,s,s) } == List('ok,'ok,'ok))
+    assert(compileTimeEval{ List(s,s,s) } == List(Symbol("ok"),Symbol("ok"),Symbol("ok")))
     
   }
   
