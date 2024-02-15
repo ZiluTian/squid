@@ -34,7 +34,7 @@ trait DeadCodeElimination extends FixPointRuleBasedTransformer with BottomUpTran
   rewrite {
     
     case code"val x: $xt = $init; $body: $bt" if referentiallyTransparent(init.rep) =>
-      body subs 'x -> Abort()
+      body subs Symbol("x") -> Abort()
       
   }
   

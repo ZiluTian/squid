@@ -44,7 +44,7 @@ class OptimTestDSL extends SimpleAST with OnlineOptimizer with SimpleRuleBasedTr
     case code"($f: $t0 => $t1) andThen ($g: t1 => $t2) apply $a" => code"$g($f($a))"
       
     /** lambda apply -> . */
-    case code"((p: $t0) => $body: $t1)($arg)" => body subs ('p -> arg)
+    case code"((p: $t0) => $body: $t1)($arg)" => body subs (Symbol("p") -> arg)
     // Version with intermediate binding (against code dup): -- may loop if val bindings are represented as redexes!!
     //case ir"((param: $t0) => $body: $t1)($arg)" => ir"val param = $arg; $body"
       

@@ -75,21 +75,21 @@ class CollectionUtilsTest extends AnyFunSuite {
   
   test("Seq of Either to 2 Seqs") {
     
-    val ls = Seq(Left('ok), Right(42), Right(666), Left('ko), Right(-1))
+    val ls = Seq(Left(Symbol("ok")), Right(42), Right(666), Left(Symbol("ko")), Right(-1))
     
     val (syms, ints) = ls mapSplit identity
     
-    assert((syms: Seq[Symbol]) == List('ok, 'ko))
+    assert((syms: Seq[Symbol]) == List(Symbol("ok"), Symbol("ko")))
     assert((ints: Seq[Int]) == List(42, 666, -1))
     
   }
   
   test("With map") {
     
-    val ctx = Map('a -> 1, 'b -> 2) map {case(n,v) => n->(n,v)}
-    val (bound, unbound) = Vector('a, 'a, 'c, 'b) collectPartition ctx
+    val ctx = Map(Symbol("a") -> 1, Symbol("b") -> 2) map {case(n,v) => n->(n,v)}
+    val (bound, unbound) = Vector(Symbol("a"), Symbol("a"), Symbol("c"), Symbol("b")) collectPartition ctx
     
-    assert( (bound: Vector[(Symbol, Int)], unbound: Vector[Symbol]) == (Vector(('a,1), ('a,1), ('b,2)),Vector('c)) )
+    assert( (bound: Vector[(Symbol, Int)], unbound: Vector[Symbol]) == (Vector((Symbol("a"),1), (Symbol("a"),1), (Symbol("b"),2)),Vector(Symbol("c"))) )
     
   }
   

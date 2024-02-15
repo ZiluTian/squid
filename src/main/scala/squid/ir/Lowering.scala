@@ -93,5 +93,5 @@ trait Lowering extends Transformer {
   
 }
 trait OnlineDesugaring extends OnlineOptimizer with Lowering with ClassEmbedder { self: ir.AST with ClassEmbedder =>
-  val loweredPhases = Set('Sugar)
+  val loweredPhases = Set(Symbol("Sugar"))
 }

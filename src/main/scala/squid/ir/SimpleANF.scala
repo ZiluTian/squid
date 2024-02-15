@@ -219,7 +219,7 @@ trait SimpleANFBase extends AST with CurryEncoding with SimpleEffects { anf =>
         MethodApp(lambda(v::Nil, body), Function1ApplySymbol, Nil, Args(r)::Nil, body.typ) |> rep
       case (Right(b), body) => if (b isEmpty) body 
         //else Imperative(b, body) |> Rep  // don't construct multi-effect Imperative's
-        else mkImperative(b, body)
+        else mkImperative(b.toSeq, body)
     }
     
     val normal = dfn match {

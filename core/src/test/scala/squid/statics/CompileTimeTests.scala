@@ -29,7 +29,7 @@ class CompileTimeTests extends AnyFunSuite {
     val t = compileTime{ s.name }
     val u = compileTime{ t.length + s.toString.size }
     
-    assert(u == "ok".length + "'ok".size)
+    assert(u == "ok".length + "Symbol(ok)".size)
     
     // This raises an assertion error at compile time, making compilation fail:
     assertDoesNotCompile("compileTimeExec{ scala.Predef.assert(u == 0) }")

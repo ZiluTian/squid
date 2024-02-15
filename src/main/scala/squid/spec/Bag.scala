@@ -42,8 +42,7 @@ trait Bag[A] {
   
   def add(x: A): Ref
   def get(r: Ref): A
-  def remove(r: Ref)
-  
+  def remove(r: Ref): Unit  
   def size: Int
   
   /** Pops an arbitrary element */
@@ -53,14 +52,14 @@ trait Bag[A] {
   // Iteration
   
   def fold[R](init: R)(f: (R, A) => R): R
-  def foreach(f: A => Unit)
+  def foreach(f: A => Unit): Unit
   
   
   // More Specialized
   
   //def find(p: A => Boolean): Bag[Ref]  // TODO can specialize this? cf. depending on the context! -- may need something like CanBuildFrom
   def find(p: A => Boolean): Iterator[Ref]
-  def findFirst(p: A => Boolean): Option[Ref] = {val f = find(p); if (f.hasNext) Some(f.next) else None}
+  def findFirst(p: A => Boolean): Option[Ref] = {val f = find(p); if (f.hasNext) Some(f.next()) else None}
   
   //def popMin: A
   //def popMax: A

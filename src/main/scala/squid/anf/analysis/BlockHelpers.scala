@@ -162,7 +162,7 @@ trait BlockHelpers extends SimpleANFBase { self => // TODO don't make it a Base 
           // Note: the trick will become unneeded once proper context polymorphism hygiene is implemented (see `doc/internal/design/future/Hygienic Context Polymorphism.md`)
           
           val curid = uid alsoDo (uid += 1)
-          val closedBody = body subs 'ClosureVar -> code"placeHolder[$xt](${Const(curid)})"
+          val closedBody = body subs Symbol("ClosureVar") -> code"placeHolder[$xt](${Const(curid)})"
           val rec = unapply(closedBody)
           import Predef.?
           def reopen[T,C](q: Code[T,C]): Code[T,C{val ClosureVar:xt.Typ}] = q rewrite {
