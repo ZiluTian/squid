@@ -22,11 +22,18 @@ import meta.RuntimeUniverseHelpers._
 /** The Stuff of Nightmares */
 object ScalaReflectSurgeon {
   
-  lazy val cache = {
-    val cls = Class.forName("scala.reflect.runtime.JavaMirrors$JavaMirror")
-    val mtd = cls.getDeclaredMethod("classCache")
-    mtd.setAccessible(true)
-    mtd.invoke(srum).asInstanceOf[TwoWayCaches#TwoWayCache[Class[_], sru.ClassSymbol]]
+  lazy val cache: TwoWayCache[Class[_], sru.ClassSymbol] = {
+    try {
+        val cls = Class.forName("scala.reflect.runtime.JavaMirrors$JavaMirror")
+        val mtd = cls.getDeclaredMethod("classCache")
+        mtd.setAccessible(true)
+        mtd.invoke(srum).asInstanceOf[TwoWayCache[Class[_], sru.ClassSymbol]]
+    } catch {
+        //zt Compilation error, method classCache not found
+        case e: Exception => 
+            new TwoWayCache[Class[_], sru.ClassSymbol]
+    }
+
   }
   
   private val inl = sru.asInstanceOf[reflect.internal.Internals with reflect.macros.Universe]
