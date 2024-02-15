@@ -15,11 +15,11 @@
 package squid
 package ir
 
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 
 import MacroTesters._
 
-class InterpreterTests extends FunSuite {
+class InterpreterTests extends AnyFunSuite {
   object b extends ir.SimpleAST
   
   val Inter = new ir.BaseInterpreter

@@ -14,7 +14,7 @@
 
 package sfusion
 
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 import squid.ir.ClassEmbedder
 import squid.utils._
 import impl._
@@ -25,7 +25,7 @@ import scala.collection.mutable
   * TODO an assertEq function that also tries different consumption modes and watches return values
   * 
   */
-class ImplTests extends FunSuite {
+class ImplTests extends AnyFunSuite {
   
   test("Unfold") {
     

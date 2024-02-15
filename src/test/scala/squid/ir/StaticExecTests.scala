@@ -15,12 +15,12 @@
 package squid
 package ir
 
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 
 import MacroTesters._
 
 /** Due to Scala reflection problems, some of these tests may sometimes crash the compiler (and sometimes not!) */
-class StaticExecTests extends FunSuite {
+class StaticExecTests extends AnyFunSuite {
   
   type AST = SimpleAST
   

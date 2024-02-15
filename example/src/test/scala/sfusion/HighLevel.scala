@@ -14,10 +14,10 @@
 
 package sfusion
 
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 import squid.ir.ClassEmbedder
 
-class HighLevel extends FunSuite {
+class HighLevel extends AnyFunSuite {
   import Sequence._
   
   val s123 = Sequence(1,2,3)

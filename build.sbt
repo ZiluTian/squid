@@ -15,7 +15,7 @@
 // val scala211Version = "2.11.12"
 // val scala212Version = "2.12.18"
 val scala213Version = "2.13.12"
-val scalatestVersion = "3.2.17"
+val scalatestVersion = "3.2.18"
 val sourceCodeVersion = "0.3.1"
 val singletonOpsVersion = "0.5.0"
 val shapelessVersion = "2.3.10"

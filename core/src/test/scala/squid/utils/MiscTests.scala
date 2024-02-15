@@ -14,9 +14,9 @@
 
 package squid.utils
 
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 
-class MiscTests extends FunSuite {
+class MiscTests extends AnyFunSuite {
   
   test("Infix If") {
     var a = 0

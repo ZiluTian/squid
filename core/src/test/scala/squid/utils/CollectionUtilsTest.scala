@@ -14,9 +14,9 @@
 
 package squid.utils
 
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 
-class CollectionUtilsTest extends FunSuite {
+class CollectionUtilsTest extends AnyFunSuite {
   import CollectionUtils._
   
   test("List Test") {

@@ -14,7 +14,7 @@
 
 package example
 
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 import squid.MyFunSuite
 import squid.ir._
 import squid.lang.InspectableBase

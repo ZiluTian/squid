@@ -14,10 +14,10 @@
 
 package squid.utils.typing
 
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 import singleton.scope
 
-class SingletonTypeTests extends FunSuite {
+class SingletonTypeTests extends AnyFunSuite {
   
   val a = 0
   

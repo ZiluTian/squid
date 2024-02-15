@@ -14,10 +14,10 @@
 
 package squid.statics
 
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 import CompileTimeTests._
 
-class CompileTimeTests2 extends FunSuite {
+class CompileTimeTests2 extends AnyFunSuite {
   
   test("Separate Compilation") {
   

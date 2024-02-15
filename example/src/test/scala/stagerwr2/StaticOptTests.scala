@@ -5,11 +5,11 @@ package stagerwr2
 import stagerwr.MyOptimizer.{optimize, dbg_optimize, optimizeAs, dbg_optimizeAs}
 import squid.statics._
 import squid.DumpFolder
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 
 //object StaticOptTests extends App {
 //object StaticOptTests extends StaticOptTests with App
-class StaticOptTests extends FunSuite {
+class StaticOptTests extends AnyFunSuite {
   
   implicit val df = compileTime(DumpFolder("/tmp"))
   //implicit val df: DumpFolder = compileTime(DumpFolder("/tmp"))

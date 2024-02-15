@@ -13,11 +13,11 @@
 // limitations under the License.
 
 package squid.lib
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 import squid.lib.matching._
-import squid.utils.shims._
+// import squid.utils.shims._
 
-class MatchingTests extends FunSuite {
+class MatchingTests extends AnyFunSuite {
   
   val x = Option(1)
   

@@ -14,15 +14,15 @@
 
 package squid.statics
 
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 
 object CompileTimeTests {
-  val s = compileTime{ 'ok }
-  val s0 = 'ko
+  val s = compileTime{ Symbol("ok") }
+  val s0 = Symbol("ko")
 }
 import CompileTimeTests._
 
-class CompileTimeTests extends FunSuite {
+class CompileTimeTests extends AnyFunSuite {
   
   test("Basics") {
     

@@ -15,10 +15,10 @@
 package squid
 package ir
 
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 import MacroTesters._
 
-class PrettyPrinterTests extends FunSuite {
+class PrettyPrinterTests extends AnyFunSuite {
   object b extends ir.SimpleAST with lang.ScalaCore
   
   val Inter = new ir.PrettyPrinter

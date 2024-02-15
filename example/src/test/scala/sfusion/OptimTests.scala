@@ -14,12 +14,12 @@
 
 package sfusion
 
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 import squid.TestDSL
 import squid.ir._
 import squid.utils._
 
-class OptimTests extends FunSuite {
+class OptimTests extends AnyFunSuite {
   
   object Compiler extends compiler.TestCompiler
   import Compiler.Code.Predef._

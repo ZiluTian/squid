@@ -14,7 +14,7 @@
 
 package sfusion
 
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 import squid.TestDSL
 import squid.ir._
 

@@ -14,7 +14,7 @@
 
 package squid
 
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 import squid.ir.AST
 import squid.ir.SimpleANF
 import squid.ir.SimpleAST
@@ -40,10 +40,10 @@ class MyFunSuite[DSL <: AST](override val DSL: DSL = TestDSL) extends MyFunSuite
 //class MyFunSuiteBase[DSL <: InspectableBase](val DSL: DSL = TestDSL2) extends MyFunSuiteTrait[DSL.type]
 //class MyFunSuiteBase[DSL <: InspectableBase](val DSL: DSL = TestDSL2) extends MyFunSuiteTrait[DSL]
 class MyFunSuiteBase[DSL <: InspectableBase](val DSL: DSL = TestDSL) extends MyFunSuiteTrait
-//abstract class MyFunSuiteTrait[DSL <: InspectableBase] extends FunSuite { funs =>
-//trait MyFunSuiteTrait[DSL <: InspectableBase] extends FunSuite { funs =>
+//abstract class MyFunSuiteTrait[DSL <: InspectableBase] extends AnyFunSuite { funs =>
+//trait MyFunSuiteTrait[DSL <: InspectableBase] extends AnyFunSuite { funs =>
   //val DSL: DSL
-trait MyFunSuiteTrait extends FunSuite { funs =>
+trait MyFunSuiteTrait extends AnyFunSuite { funs =>
   val DSL: InspectableBase
   import DSL._
   
